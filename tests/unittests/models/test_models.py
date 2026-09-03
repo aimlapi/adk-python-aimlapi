@@ -101,6 +101,9 @@ def test_match_litellm_family(model_name):
         'gemini/gemini-3.5-flash',
         'openrouter/anthropic/claude-opus-4',
         'cerebras/llama-3.3-70b',
+        # An aggregator id keeps its own slash: only the first segment is the
+        # LiteLLM provider, so the rest must survive resolution untouched.
+        'aiml/openai/gpt-4o-mini',
     ],
 )
 def test_match_litellm_provider_not_spelled_out_in_registry(model_name):
@@ -189,6 +192,16 @@ def test_resolve_with_prefix():
   assert models.LLMRegistry.resolve('Claude:claude-3-opus@20240229') is Claude
   assert models.LLMRegistry.resolve('lite:openai/gpt-4o') is LiteLlm
   assert models.LLMRegistry.resolve('LiteLlm:openai/gpt-4o') is LiteLlm
+
+
+def test_new_llm_keeps_a_multi_segment_provider_model_name():
+  """Test that only the class prefix, never a provider prefix, is stripped."""
+  llm = models.LLMRegistry.new_llm('aiml/openai/gpt-4o-mini')
+
+  assert isinstance(llm, LiteLlm)
+  # LiteLLM splits the provider off the first slash itself, so handing it a
+  # shortened name here would route to the wrong model.
+  assert llm.model == 'aiml/openai/gpt-4o-mini'
 
 
 def test_register_after_resolve_returns_the_new_class():
