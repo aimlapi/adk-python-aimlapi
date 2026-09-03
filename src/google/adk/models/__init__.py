@@ -81,6 +81,7 @@ _LAZY_PROVIDERS: dict[str, tuple[list[str], str]] = {
     ),
     'LiteLlm': (
         [
+            r'aiml/.*',
             r'openai/.*',
             r'azure/.*',
             r'azure_ai/.*',

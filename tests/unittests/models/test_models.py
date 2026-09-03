@@ -81,6 +81,9 @@ def test_match_claude_family(model_name):
 @pytest.mark.parametrize(
     'model_name',
     [
+        # An aggregator id keeps its own slash: only the first segment is the
+        # LiteLLM provider, so the rest must survive resolution untouched.
+        'aiml/openai/gpt-4o-mini',
         'openai/gpt-4o',
         'openai/gpt-4o-mini',
         'groq/llama3-70b-8192',
@@ -101,9 +104,6 @@ def test_match_litellm_family(model_name):
         'gemini/gemini-3.5-flash',
         'openrouter/anthropic/claude-opus-4',
         'cerebras/llama-3.3-70b',
-        # An aggregator id keeps its own slash: only the first segment is the
-        # LiteLLM provider, so the rest must survive resolution untouched.
-        'aiml/openai/gpt-4o-mini',
     ],
 )
 def test_match_litellm_provider_not_spelled_out_in_registry(model_name):
