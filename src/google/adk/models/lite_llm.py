@@ -3545,6 +3545,8 @@ class LiteLlm(BaseLlm):
     """
 
     return [
+        # For aimlapi.com models (e.g., "aiml/openai/gpt-4o-mini")
+        r"aiml/.*",
         # For OpenAI models (e.g., "openai/gpt-4o")
         r"openai/.*",
         # For Azure OpenAI models (e.g., "azure/gpt-4o")

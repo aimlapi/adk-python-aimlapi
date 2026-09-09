@@ -81,6 +81,9 @@ def test_match_claude_family(model_name):
 @pytest.mark.parametrize(
     'model_name',
     [
+        # An aggregator id keeps its own slash: only the first segment is the
+        # LiteLLM provider, so the rest must survive resolution untouched.
+        'aiml/openai/gpt-4o-mini',
         'openai/gpt-4o',
         'openai/gpt-4o-mini',
         'groq/llama3-70b-8192',
@@ -189,6 +192,16 @@ def test_resolve_with_prefix():
   assert models.LLMRegistry.resolve('Claude:claude-3-opus@20240229') is Claude
   assert models.LLMRegistry.resolve('lite:openai/gpt-4o') is LiteLlm
   assert models.LLMRegistry.resolve('LiteLlm:openai/gpt-4o') is LiteLlm
+
+
+def test_new_llm_keeps_a_multi_segment_provider_model_name():
+  """Test that only the class prefix, never a provider prefix, is stripped."""
+  llm = models.LLMRegistry.new_llm('aiml/openai/gpt-4o-mini')
+
+  assert isinstance(llm, LiteLlm)
+  # LiteLLM splits the provider off the first slash itself, so handing it a
+  # shortened name here would route to the wrong model.
+  assert llm.model == 'aiml/openai/gpt-4o-mini'
 
 
 def test_register_after_resolve_returns_the_new_class():
